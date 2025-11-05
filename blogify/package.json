@@ -1,0 +1,19 @@
+{
+  "name": "blogify-lambdas",
+  "version": "1.0.0",
+  "description": "Lambda functions for Blogify headless CMS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.650.0",
+    "@aws-sdk/lib-dynamodb": "^3.650.0",
+    "@aws-sdk/client-s3": "^3.650.0",
+    "@aws-sdk/s3-request-presigner": "^3.650.0",
+    "@aws-sdk/client-sns": "^3.650.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
