@@ -151,3 +151,95 @@ resource "aws_apigatewayv2_route" "manageSubscription" {
   route_key = "POST /subscriptions/{action}"
   target    = "integrations/${aws_apigatewayv2_integration.manageSubscription.id}"
 }
+
+resource "aws_apigatewayv2_integration" "getUserProfile" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.getUserProfile.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "getUserProfile" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "GET /profile"
+  target             = "integrations/${aws_apigatewayv2_integration.getUserProfile.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_integration" "updateUserProfile" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.updateUserProfile.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "updateUserProfile" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "PUT /profile"
+  target             = "integrations/${aws_apigatewayv2_integration.updateUserProfile.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_integration" "getPublicProfile" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.getPublicProfile.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "getPublicProfile" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "GET /users/{userId}"
+  target    = "integrations/${aws_apigatewayv2_integration.getPublicProfile.id}"
+}
+
+resource "aws_apigatewayv2_integration" "deleteUserAccount" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.deleteUserAccount.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "deleteUserAccount" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "DELETE /account"
+  target             = "integrations/${aws_apigatewayv2_integration.deleteUserAccount.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_integration" "changePassword" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.changePassword.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "changePassword" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "POST /account/change-password"
+  target             = "integrations/${aws_apigatewayv2_integration.changePassword.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_integration" "registerUser" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.registerUser.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "registerUser" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /auth/register"
+  target    = "integrations/${aws_apigatewayv2_integration.registerUser.id}"
+}
+
+resource "aws_apigatewayv2_integration" "loginUser" {
+  api_id           = aws_apigatewayv2_api.main.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = aws_lambda_function.loginUser.invoke_arn
+}
+
+resource "aws_apigatewayv2_route" "loginUser" {
+  api_id    = aws_apigatewayv2_api.main.id
+  route_key = "POST /auth/login"
+  target    = "integrations/${aws_apigatewayv2_integration.loginUser.id}"
+}

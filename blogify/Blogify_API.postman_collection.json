@@ -1,0 +1,762 @@
+{
+	"info": {
+		"name": "Blogify API",
+		"description": "Collection complète pour tester toutes les Lambdas de l'API Blogify",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "Create Post",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Mon premier article de blog\",\n    \"content\": \"Ceci est le contenu de mon article. Il contient des informations intéressantes sur le développement web avec AWS Lambda.\",\n    \"status\": \"draft\",\n    \"tags\": [\"aws\", \"lambda\", \"serverless\", \"nodejs\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							]
+						},
+						"description": "Crée un nouveau post. Nécessite une authentification JWT."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Post",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							],
+							"query": [
+								{
+									"key": "createdAt",
+									"value": "{{createdAt}}",
+									"description": "Timestamp de création du post (requis)"
+								}
+							]
+						},
+						"description": "Récupère un post spécifique par son ID et timestamp de création."
+					},
+					"response": []
+				},
+				{
+					"name": "List Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts?limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Nombre de posts à retourner"
+								},
+								{
+									"key": "userId",
+									"value": "",
+									"description": "Filtrer par userId (optionnel)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Liste tous les posts avec pagination optionnelle."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Post",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Titre mis à jour\",\n    \"content\": \"Contenu mis à jour avec des informations supplémentaires.\",\n    \"status\": \"published\",\n    \"tags\": [\"aws\", \"lambda\", \"serverless\", \"nodejs\", \"dynamodb\"]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							],
+							"query": [
+								{
+									"key": "createdAt",
+									"value": "{{createdAt}}"
+								}
+							]
+						},
+						"description": "Met à jour un post existant. Nécessite une authentification JWT et que l'utilisateur soit le propriétaire du post."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Post",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							],
+							"query": [
+								{
+									"key": "createdAt",
+									"value": "{{createdAt}}"
+								}
+							]
+						},
+						"description": "Supprime un post. Nécessite une authentification JWT et que l'utilisateur soit le propriétaire du post."
+					},
+					"response": []
+				},
+				{
+					"name": "Search Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/search?query=serverless&limit=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "serverless",
+									"description": "Terme de recherche"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Nombre de résultats"
+								}
+							]
+						},
+						"description": "Recherche des posts par mot-clé dans le titre, le contenu ou les tags."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des posts de blog"
+		},
+		{
+			"name": "Media",
+			"item": [
+				{
+					"name": "Upload Media",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fileName\": \"mon-image.jpg\",\n    \"fileType\": \"image/jpeg\",\n    \"fileSize\": 245678\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/media",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media"
+							]
+						},
+						"description": "Génère une URL signée pour uploader un fichier média sur S3. Nécessite une authentification JWT.\n\nRéponse contient:\n- uploadUrl: URL pré-signée pour uploader le fichier\n- mediaId: ID du média\n- s3Key: Clé S3 du fichier"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Media",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/media/{{mediaId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"media",
+								"{{mediaId}}"
+							]
+						},
+						"description": "Récupère les métadonnées d'un fichier média par son ID."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des fichiers média (images, vidéos, etc.)"
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Create Comment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"Excellent article ! J'ai beaucoup appris sur les Lambda functions.\",\n    \"authorName\": \"Jean Dupont\",\n    \"authorEmail\": \"jean.dupont@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}",
+								"comments"
+							]
+						},
+						"description": "Crée un nouveau commentaire sur un post. Peut être anonyme ou authentifié.\n\nLe commentaire est créé avec le status 'pending' et doit être modéré."
+					},
+					"response": []
+				},
+				{
+					"name": "List Comments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}/comments?limit=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Nombre de commentaires à retourner"
+								}
+							]
+						},
+						"description": "Liste tous les commentaires d'un post spécifique."
+					},
+					"response": []
+				},
+				{
+					"name": "Moderate Comment - Approve",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"approved\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}/moderate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}",
+								"moderate"
+							]
+						},
+						"description": "Approuve un commentaire en attente de modération. Nécessite une authentification JWT et le rôle modérateur."
+					},
+					"response": []
+				},
+				{
+					"name": "Moderate Comment - Reject",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"rejected\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}/moderate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}",
+								"moderate"
+							]
+						},
+						"description": "Rejette un commentaire. Nécessite une authentification JWT et le rôle modérateur."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des commentaires sur les posts"
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"password\": \"Test123!@#\",\n    \"displayName\": \"Test User\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Crée un nouveau compte utilisateur.\n\nChamps requis:\n- email: Email valide\n- username: Nom d'utilisateur (3-20 caractères)\n- password: Mot de passe (8+ caractères, majuscule, minuscule, chiffre, symbole)\n\nChamps optionnels:\n- displayName: Nom d'affichage\n\nLe compte est créé dans Cognito et le profil dans DynamoDB."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.userId) {",
+									"        pm.environment.set(\"userId\", jsonData.userId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"Test123!@#\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Se connecte avec un compte existant.\n\nChamps requis:\n- username: Nom d'utilisateur ou email\n- password: Mot de passe\n\nRéponse contient:\n- authToken: Token JWT (IdToken) à utiliser dans Authorization\n- accessToken: Token d'accès\n- refreshToken: Token pour renouveler\n- expiresIn: Durée de validité en secondes\n\nUtilisez authToken avec 'Bearer ' devant dans les requêtes authentifiées."
+					},
+					"response": [],
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.authToken) {",
+									"        pm.environment.set(\"authToken\", \"Bearer \" + jsonData.authToken);",
+									"        console.log(\"Token saved to environment: Bearer \" + jsonData.authToken.substring(0, 20) + \"...\");",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					]
+				}
+			],
+			"description": "Endpoints pour l'authentification (inscription, connexion)"
+		},
+		{
+			"name": "User Account",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Récupère le profil de l'utilisateur connecté. Nécessite une authentification JWT.\n\nRetourne les informations complètes du profil incluant l'email et les données privées."
+					},
+					"response": []
+				},
+				{
+					"name": "Update My Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"displayName\": \"Jean Dupont\",\n    \"bio\": \"Développeur passionné par le serverless et AWS\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"website\": \"https://jeandupont.dev\",\n    \"location\": \"Paris, France\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"profile"
+							]
+						},
+						"description": "Met à jour le profil de l'utilisateur connecté. Nécessite une authentification JWT.\n\nChamps modifiables:\n- displayName: Nom d'affichage\n- bio: Biographie\n- avatar: URL de l'avatar\n- website: Site web personnel\n- location: Localisation"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": "Récupère le profil public d'un utilisateur par son ID.\n\nRetourne uniquement les informations publiques (pas d'email ni de données privées)."
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"previousPassword\": \"OldPassword123!@#\",\n    \"proposedPassword\": \"NewPassword123!@#\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/account/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account",
+								"change-password"
+							]
+						},
+						"description": "Change le mot de passe de l'utilisateur connecté. Nécessite une authentification JWT.\n\nLe nouveau mot de passe doit respecter:\n- Au moins 8 caractères\n- Au moins une majuscule\n- Au moins une minuscule\n- Au moins un chiffre\n- Au moins un caractère spécial"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Account",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/account",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"account"
+							]
+						},
+						"description": "Supprime définitivement le compte utilisateur. Nécessite une authentification JWT.\n\n⚠️ ATTENTION: Cette action est irréversible!\n\nSupprime:\n- Le profil utilisateur de la base de données\n- Le compte Cognito\n\nNote: Les posts, commentaires et autres contenus créés par l'utilisateur ne sont PAS automatiquement supprimés."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion du compte utilisateur (profil, mot de passe, suppression)"
+		},
+		{
+			"name": "Subscriptions",
+			"item": [
+				{
+					"name": "Subscribe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"subscriber@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/subscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions",
+								"subscribe"
+							]
+						},
+						"description": "S'abonne aux notifications de nouveaux posts.\n\nRetourne un subscriptionId qui peut être utilisé pour se désabonner."
+					},
+					"response": []
+				},
+				{
+					"name": "Unsubscribe",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"subscriber@example.com\",\n    \"subscriptionId\": \"{{subscriptionId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/unsubscribe",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions",
+								"unsubscribe"
+							]
+						},
+						"description": "Se désabonne des notifications.\n\nNécessite l'email et le subscriptionId reçu lors de l'abonnement."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints pour la gestion des abonnements aux notifications"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://your-api-id.execute-api.us-east-1.amazonaws.com",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "Bearer YOUR_JWT_TOKEN_HERE",
+			"type": "string"
+		},
+		{
+			"key": "postId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "createdAt",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "mediaId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "commentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "subscriptionId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

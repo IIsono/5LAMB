@@ -10,50 +10,59 @@ exports.handler = async (event) => {
     const { action } = event.pathParameters;
     const body = JSON.parse(event.body);
     const { email } = body;
-    
+
+    // Récupérer userId si authentifié
+    const userId = event.requestContext.authorizer?.jwt?.claims?.sub || null;
+
     if (!email || !email.includes("@")) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Valid email is required" })
       };
     }
-    
+
     if (action === "subscribe") {
       const subscriptionId = randomUUID();
       const subscription = {
         subscriptionId,
         email,
+        userId,  // Lier au compte utilisateur si authentifié
         status: "active",
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        preferences: {
+          newPosts: true,
+          comments: false
+        }
       };
-      
+
       await docClient.send(new PutCommand({
         TableName: process.env.SUBSCRIPTIONS_TABLE,
         Item: subscription
       }));
-      
+
       return {
         statusCode: 201,
         body: JSON.stringify({
           message: "Successfully subscribed",
-          subscriptionId
+          subscriptionId,
+          isLinkedToAccount: userId !== null
         })
       };
     } else if (action === "unsubscribe") {
       const { subscriptionId } = body;
-      
+
       if (!subscriptionId) {
         return {
           statusCode: 400,
           body: JSON.stringify({ message: "subscriptionId is required" })
         };
       }
-      
+
       await docClient.send(new DeleteCommand({
         TableName: process.env.SUBSCRIPTIONS_TABLE,
         Key: { subscriptionId }
       }));
-      
+
       return {
         statusCode: 200,
         body: JSON.stringify({ message: "Successfully unsubscribed" })

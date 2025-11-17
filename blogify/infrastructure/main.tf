@@ -128,7 +128,7 @@ resource "aws_dynamodb_table" "subscriptions" {
 }
 
 resource "aws_s3_bucket" "media" {
-  bucket = "blogify-media-${var.environment}"
+  bucket = "blogify-media-${var.environment}-913826031566"
 
   tags = {
     Project = "Blogify"
@@ -172,6 +172,11 @@ resource "aws_cognito_user_pool" "main" {
     name                = "role"
     attribute_data_type = "String"
     mutable             = true
+
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 20
+    }
   }
 
   tags = {
@@ -314,40 +319,4 @@ resource "aws_sns_topic_subscription" "email_subscription" {
   topic_arn = aws_sns_topic.post_notifications.arn
   protocol  = "email"
   endpoint  = var.notification_email
-}
-
-resource "aws_dynamodb_table" "posts" {
-  name           = "blogify-posts"
-  billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "postId"
-  range_key      = "createdAt"
-
-  attribute {
-    name = "postId"
-    type = "S"
-  }
-
-  attribute {
-    name = "createdAt"
-    type = "N"
-  }
-
-  attribute {
-    name = "userId"
-    type = "S"
-  }
-
-  global_secondary_index {
-    name            = "userId-createdAt-index"
-    hash_key        = "userId"
-    range_key       = "createdAt"
-    projection_type = "ALL"
-  }
-
-  stream_enabled   = true
-  stream_view_type = "NEW_AND_OLD_IMAGES"
-
-  tags = {
-    Project = "Blogify"
-  }
 }
