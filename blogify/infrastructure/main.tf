@@ -30,7 +30,6 @@ resource "aws_dynamodb_table" "posts" {
   name           = "blogify-posts"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "postId"
-  range_key      = "createdAt"
 
   attribute {
     name = "postId"
@@ -38,13 +37,13 @@ resource "aws_dynamodb_table" "posts" {
   }
 
   attribute {
-    name = "createdAt"
-    type = "N"
+    name = "userId"
+    type = "S"
   }
 
   attribute {
-    name = "userId"
-    type = "S"
+    name = "createdAt"
+    type = "N"
   }
 
   global_secondary_index {
@@ -56,6 +55,10 @@ resource "aws_dynamodb_table" "posts" {
 
   stream_enabled   = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
+
+  lifecycle {
+    prevent_destroy = false
+  }
 
   tags = {
     Project = "Blogify"
@@ -107,6 +110,11 @@ resource "aws_dynamodb_table" "comments" {
   stream_enabled   = true
   stream_view_type = "NEW_AND_OLD_IMAGES"
 
+  # Lifecycle pour éviter les problèmes lors du destroy
+  lifecycle {
+    prevent_destroy = false
+  }
+
   tags = {
     Project = "Blogify"
   }
@@ -115,11 +123,26 @@ resource "aws_dynamodb_table" "comments" {
 resource "aws_dynamodb_table" "subscriptions" {
   name           = "blogify-subscriptions"
   billing_mode   = "PAY_PER_REQUEST"
-  hash_key       = "subscriptionId"
+  hash_key       = "followerId"
+  range_key      = "followedId"
 
   attribute {
-    name = "subscriptionId"
+    name = "followerId"
     type = "S"
+  }
+
+  attribute {
+    name = "followedId"
+    type = "S"
+  }
+
+  global_secondary_index {
+    name               = "followedId-index"
+    hash_key           = "followedId"
+    range_key          = "followerId"
+    projection_type    = "ALL"
+    read_capacity      = 0
+    write_capacity     = 0
   }
 
   tags = {
@@ -128,7 +151,8 @@ resource "aws_dynamodb_table" "subscriptions" {
 }
 
 resource "aws_s3_bucket" "media" {
-  bucket = "blogify-media-${var.environment}-913826031566"
+  bucket        = "blogify-media-${var.environment}-913826031566"
+  force_destroy = true
 
   tags = {
     Project = "Blogify"
@@ -158,7 +182,7 @@ resource "aws_s3_bucket_cors_configuration" "media" {
 resource "aws_cognito_user_pool" "main" {
   name = "blogify-user-pool"
 
-  auto_verified_attributes = ["email"]
+  deletion_protection = "INACTIVE"
 
   password_policy {
     minimum_length    = 8
@@ -166,6 +190,11 @@ resource "aws_cognito_user_pool" "main" {
     require_numbers   = true
     require_symbols   = true
     require_uppercase = true
+  }
+
+  # Lambda trigger pour auto-confirmer tous les utilisateurs
+  lambda_config {
+    pre_sign_up = aws_lambda_function.cognito_pre_signup.arn
   }
 
   schema {
@@ -267,6 +296,15 @@ resource "aws_iam_policy" "lambda_dynamodb_s3" {
         Resource = [
           "${aws_dynamodb_table.posts.arn}/stream/*"
         ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cognito-idp:AdminConfirmSignUp",
+          "cognito-idp:AdminGetUser",
+          "cognito-idp:AdminUpdateUserAttributes"
+        ]
+        Resource = aws_cognito_user_pool.main.arn
       }
     ]
   })

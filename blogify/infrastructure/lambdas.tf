@@ -1,38 +1,9 @@
-data "archive_file" "lambda_zip" {
-  for_each = toset([
-    "createPost",
-    "getPost",
-    "listPosts",
-    "updatePost",
-    "deletePost",
-    "uploadMedia",
-    "getMedia",
-    "createComment",
-    "listComments",
-    "moderateComment",
-    "searchPosts",
-    "manageSubscription",
-    "notifySubscribers",
-    "getUserProfile",
-    "updateUserProfile",
-    "getPublicProfile",
-    "deleteUserAccount",
-    "changePassword",
-    "registerUser",
-    "loginUser"
-  ])
-
-  type        = "zip"
-  source_file = "../lambdas/${each.key}.js"
-  output_path = "../lambdas/${each.key}.zip"
-}
-
 resource "aws_lambda_function" "createPost" {
-  filename         = data.archive_file.lambda_zip["createPost"].output_path
+  filename         = "../lambdas/dist/createPost.zip"
   function_name    = "blogify-createPost"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "createPost.handler"
-  source_code_hash = data.archive_file.lambda_zip["createPost"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/createPost.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -43,11 +14,11 @@ resource "aws_lambda_function" "createPost" {
 }
 
 resource "aws_lambda_function" "getPost" {
-  filename         = data.archive_file.lambda_zip["getPost"].output_path
+  filename         = "../lambdas/dist/getPost.zip"
   function_name    = "blogify-getPost"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "getPost.handler"
-  source_code_hash = data.archive_file.lambda_zip["getPost"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/getPost.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -58,11 +29,11 @@ resource "aws_lambda_function" "getPost" {
 }
 
 resource "aws_lambda_function" "listPosts" {
-  filename         = data.archive_file.lambda_zip["listPosts"].output_path
+  filename         = "../lambdas/dist/listPosts.zip"
   function_name    = "blogify-listPosts"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "listPosts.handler"
-  source_code_hash = data.archive_file.lambda_zip["listPosts"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/listPosts.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -74,11 +45,11 @@ resource "aws_lambda_function" "listPosts" {
 }
 
 resource "aws_lambda_function" "updatePost" {
-  filename         = data.archive_file.lambda_zip["updatePost"].output_path
+  filename         = "../lambdas/dist/updatePost.zip"
   function_name    = "blogify-updatePost"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "updatePost.handler"
-  source_code_hash = data.archive_file.lambda_zip["updatePost"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/updatePost.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -89,11 +60,11 @@ resource "aws_lambda_function" "updatePost" {
 }
 
 resource "aws_lambda_function" "deletePost" {
-  filename         = data.archive_file.lambda_zip["deletePost"].output_path
+  filename         = "../lambdas/dist/deletePost.zip"
   function_name    = "blogify-deletePost"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "deletePost.handler"
-  source_code_hash = data.archive_file.lambda_zip["deletePost"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/deletePost.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -104,11 +75,11 @@ resource "aws_lambda_function" "deletePost" {
 }
 
 resource "aws_lambda_function" "uploadMedia" {
-  filename         = data.archive_file.lambda_zip["uploadMedia"].output_path
+  filename         = "../lambdas/dist/uploadMedia.zip"
   function_name    = "blogify-uploadMedia"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "uploadMedia.handler"
-  source_code_hash = data.archive_file.lambda_zip["uploadMedia"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/uploadMedia.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -120,11 +91,11 @@ resource "aws_lambda_function" "uploadMedia" {
 }
 
 resource "aws_lambda_function" "getMedia" {
-  filename         = data.archive_file.lambda_zip["getMedia"].output_path
+  filename         = "../lambdas/dist/getMedia.zip"
   function_name    = "blogify-getMedia"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "getMedia.handler"
-  source_code_hash = data.archive_file.lambda_zip["getMedia"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/getMedia.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -135,11 +106,11 @@ resource "aws_lambda_function" "getMedia" {
 }
 
 resource "aws_lambda_function" "createComment" {
-  filename         = data.archive_file.lambda_zip["createComment"].output_path
+  filename         = "../lambdas/dist/createComment.zip"
   function_name    = "blogify-createComment"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "createComment.handler"
-  source_code_hash = data.archive_file.lambda_zip["createComment"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/createComment.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -150,11 +121,11 @@ resource "aws_lambda_function" "createComment" {
 }
 
 resource "aws_lambda_function" "listComments" {
-  filename         = data.archive_file.lambda_zip["listComments"].output_path
+  filename         = "../lambdas/dist/listComments.zip"
   function_name    = "blogify-listComments"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "listComments.handler"
-  source_code_hash = data.archive_file.lambda_zip["listComments"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/listComments.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -165,27 +136,12 @@ resource "aws_lambda_function" "listComments" {
   }
 }
 
-resource "aws_lambda_function" "moderateComment" {
-  filename         = data.archive_file.lambda_zip["moderateComment"].output_path
-  function_name    = "blogify-moderateComment"
-  role            = aws_iam_role.lambda_exec.arn
-  handler         = "moderateComment.handler"
-  source_code_hash = data.archive_file.lambda_zip["moderateComment"].output_base64sha256
-  runtime         = "nodejs20.x"
-
-  environment {
-    variables = {
-      COMMENTS_TABLE = aws_dynamodb_table.comments.name
-    }
-  }
-}
-
 resource "aws_lambda_function" "searchPosts" {
-  filename         = data.archive_file.lambda_zip["searchPosts"].output_path
+  filename         = "../lambdas/dist/searchPosts.zip"
   function_name    = "blogify-searchPosts"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "searchPosts.handler"
-  source_code_hash = data.archive_file.lambda_zip["searchPosts"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/searchPosts.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -196,11 +152,11 @@ resource "aws_lambda_function" "searchPosts" {
 }
 
 resource "aws_lambda_function" "manageSubscription" {
-  filename         = data.archive_file.lambda_zip["manageSubscription"].output_path
+  filename         = "../lambdas/dist/manageSubscription.zip"
   function_name    = "blogify-manageSubscription"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "manageSubscription.handler"
-  source_code_hash = data.archive_file.lambda_zip["manageSubscription"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/manageSubscription.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -211,11 +167,11 @@ resource "aws_lambda_function" "manageSubscription" {
 }
 
 resource "aws_lambda_function" "notifySubscribers" {
-  filename         = data.archive_file.lambda_zip["notifySubscribers"].output_path
+  filename         = "../lambdas/dist/notifySubscribers.zip"
   function_name    = "blogify-notifySubscribers"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "notifySubscribers.handler"
-  source_code_hash = data.archive_file.lambda_zip["notifySubscribers"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/notifySubscribers.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -239,11 +195,11 @@ resource "aws_lambda_event_source_mapping" "posts_stream" {
 }
 
 resource "aws_lambda_function" "getUserProfile" {
-  filename         = data.archive_file.lambda_zip["getUserProfile"].output_path
+  filename         = "../lambdas/dist/getUserProfile.zip"
   function_name    = "blogify-getUserProfile"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "getUserProfile.handler"
-  source_code_hash = data.archive_file.lambda_zip["getUserProfile"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/getUserProfile.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -254,26 +210,27 @@ resource "aws_lambda_function" "getUserProfile" {
 }
 
 resource "aws_lambda_function" "updateUserProfile" {
-  filename         = data.archive_file.lambda_zip["updateUserProfile"].output_path
+  filename         = "../lambdas/dist/updateUserProfile.zip"
   function_name    = "blogify-updateUserProfile"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "updateUserProfile.handler"
-  source_code_hash = data.archive_file.lambda_zip["updateUserProfile"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/updateUserProfile.zip")
   runtime         = "nodejs20.x"
 
   environment {
     variables = {
-      USERS_TABLE = aws_dynamodb_table.users.name
+      USERS_TABLE          = aws_dynamodb_table.users.name
+      COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
     }
   }
 }
 
 resource "aws_lambda_function" "getPublicProfile" {
-  filename         = data.archive_file.lambda_zip["getPublicProfile"].output_path
+  filename         = "../lambdas/dist/getPublicProfile.zip"
   function_name    = "blogify-getPublicProfile"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "getPublicProfile.handler"
-  source_code_hash = data.archive_file.lambda_zip["getPublicProfile"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/getPublicProfile.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -284,11 +241,11 @@ resource "aws_lambda_function" "getPublicProfile" {
 }
 
 resource "aws_lambda_function" "deleteUserAccount" {
-  filename         = data.archive_file.lambda_zip["deleteUserAccount"].output_path
+  filename         = "../lambdas/dist/deleteUserAccount.zip"
   function_name    = "blogify-deleteUserAccount"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "deleteUserAccount.handler"
-  source_code_hash = data.archive_file.lambda_zip["deleteUserAccount"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/deleteUserAccount.zip")
   runtime         = "nodejs20.x"
 
   environment {
@@ -299,45 +256,45 @@ resource "aws_lambda_function" "deleteUserAccount" {
 }
 
 resource "aws_lambda_function" "changePassword" {
-  filename         = data.archive_file.lambda_zip["changePassword"].output_path
+  filename         = "../lambdas/dist/changePassword.zip"
   function_name    = "blogify-changePassword"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "changePassword.handler"
-  source_code_hash = data.archive_file.lambda_zip["changePassword"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/changePassword.zip")
   runtime         = "nodejs20.x"
 }
 
 resource "aws_lambda_function" "registerUser" {
-  filename         = data.archive_file.lambda_zip["registerUser"].output_path
+  filename         = "../lambdas/dist/registerUser.zip"
   function_name    = "blogify-registerUser"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "registerUser.handler"
-  source_code_hash = data.archive_file.lambda_zip["registerUser"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/registerUser.zip")
   runtime         = "nodejs20.x"
 
   environment {
     variables = {
-      USERS_TABLE           = aws_dynamodb_table.users.name
-      COGNITO_USER_POOL_ID  = aws_cognito_user_pool.main.id
-      COGNITO_CLIENT_ID     = aws_cognito_user_pool_client.main.id
-      AUTO_CONFIRM_USERS    = "true"  # Mode développement - auto-confirme les utilisateurs
+      USERS_TABLE          = aws_dynamodb_table.users.name
+      COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
+      COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.main.id
+      AUTO_CONFIRM_USERS   = "true"
     }
   }
 }
 
 resource "aws_lambda_function" "loginUser" {
-  filename         = data.archive_file.lambda_zip["loginUser"].output_path
+  filename         = "../lambdas/dist/loginUser.zip"
   function_name    = "blogify-loginUser"
   role            = aws_iam_role.lambda_exec.arn
   handler         = "loginUser.handler"
-  source_code_hash = data.archive_file.lambda_zip["loginUser"].output_base64sha256
+  source_code_hash = filebase64sha256("../lambdas/dist/loginUser.zip")
   runtime         = "nodejs20.x"
 
   environment {
     variables = {
       COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.main.id
       COGNITO_USER_POOL_ID = aws_cognito_user_pool.main.id
-      AUTO_CONFIRM_USERS   = "true"  # Mode développement
+      AUTO_CONFIRM_USERS   = "true"
     }
   }
 }
@@ -353,7 +310,6 @@ locals {
     "getMedia"            = aws_lambda_function.getMedia.function_name
     "createComment"       = aws_lambda_function.createComment.function_name
     "listComments"        = aws_lambda_function.listComments.function_name
-    "moderateComment"     = aws_lambda_function.moderateComment.function_name
     "searchPosts"         = aws_lambda_function.searchPosts.function_name
     "manageSubscription"  = aws_lambda_function.manageSubscription.function_name
     "getUserProfile"      = aws_lambda_function.getUserProfile.function_name
@@ -374,4 +330,22 @@ resource "aws_lambda_permission" "api_gateway" {
   function_name = each.value
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.main.execution_arn}/*/*"
+}
+
+# Lambda trigger Cognito
+resource "aws_lambda_function" "cognito_pre_signup" {
+  filename         = "../lambdas/dist/cognitoPreSignup.zip"
+  function_name    = "blogify-cognito-pre-signup"
+  role            = aws_iam_role.lambda_exec.arn
+  handler         = "cognitoPreSignup.handler"
+  source_code_hash = filebase64sha256("../lambdas/dist/cognitoPreSignup.zip")
+  runtime         = "nodejs20.x"
+}
+
+resource "aws_lambda_permission" "cognito_pre_signup" {
+  statement_id  = "AllowCognitoInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cognito_pre_signup.function_name
+  principal     = "cognito-idp.amazonaws.com"
+  source_arn    = aws_cognito_user_pool.main.arn
 }

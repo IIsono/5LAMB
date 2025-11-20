@@ -97,9 +97,11 @@ resource "aws_apigatewayv2_integration" "createComment" {
 }
 
 resource "aws_apigatewayv2_route" "createComment" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "POST /posts/{postId}/comments"
-  target    = "integrations/${aws_apigatewayv2_integration.createComment.id}"
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "POST /posts/{postId}/comments"
+  target             = "integrations/${aws_apigatewayv2_integration.createComment.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 resource "aws_apigatewayv2_integration" "listComments" {
@@ -112,20 +114,6 @@ resource "aws_apigatewayv2_route" "listComments" {
   api_id    = aws_apigatewayv2_api.main.id
   route_key = "GET /posts/{postId}/comments"
   target    = "integrations/${aws_apigatewayv2_integration.listComments.id}"
-}
-
-resource "aws_apigatewayv2_integration" "moderateComment" {
-  api_id           = aws_apigatewayv2_api.main.id
-  integration_type = "AWS_PROXY"
-  integration_uri  = aws_lambda_function.moderateComment.invoke_arn
-}
-
-resource "aws_apigatewayv2_route" "moderateComment" {
-  api_id             = aws_apigatewayv2_api.main.id
-  route_key          = "PUT /comments/{commentId}/moderate"
-  target             = "integrations/${aws_apigatewayv2_integration.moderateComment.id}"
-  authorization_type = "JWT"
-  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 resource "aws_apigatewayv2_integration" "searchPosts" {
@@ -147,9 +135,19 @@ resource "aws_apigatewayv2_integration" "manageSubscription" {
 }
 
 resource "aws_apigatewayv2_route" "manageSubscription" {
-  api_id    = aws_apigatewayv2_api.main.id
-  route_key = "POST /subscriptions/{action}"
-  target    = "integrations/${aws_apigatewayv2_integration.manageSubscription.id}"
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "POST /subscriptions/{action}"
+  target             = "integrations/${aws_apigatewayv2_integration.manageSubscription.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+resource "aws_apigatewayv2_route" "getSubscription" {
+  api_id             = aws_apigatewayv2_api.main.id
+  route_key          = "GET /subscriptions/{action}"
+  target             = "integrations/${aws_apigatewayv2_integration.manageSubscription.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 resource "aws_apigatewayv2_integration" "getUserProfile" {
