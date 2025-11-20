@@ -47,23 +47,16 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"raw": "{{baseUrl}}/posts/{{postId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"posts",
 								"{{postId}}"
-							],
-							"query": [
-								{
-									"key": "createdAt",
-									"value": "{{createdAt}}",
-									"description": "Timestamp de création du post (requis)"
-								}
 							]
 						},
-						"description": "Récupère un post spécifique par son ID et timestamp de création."
+						"description": "Récupère un post spécifique par son ID"
 					},
 					"response": []
 				},
@@ -119,19 +112,13 @@
 							"raw": "{\n    \"title\": \"Titre mis à jour\",\n    \"content\": \"Contenu mis à jour avec des informations supplémentaires.\",\n    \"status\": \"published\",\n    \"tags\": [\"aws\", \"lambda\", \"serverless\", \"nodejs\", \"dynamodb\"]\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"raw": "{{baseUrl}}/posts/{{postId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"posts",
 								"{{postId}}"
-							],
-							"query": [
-								{
-									"key": "createdAt",
-									"value": "{{createdAt}}"
-								}
 							]
 						},
 						"description": "Met à jour un post existant. Nécessite une authentification JWT et que l'utilisateur soit le propriétaire du post."
@@ -150,19 +137,13 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/posts/{{postId}}?createdAt={{createdAt}}",
+							"raw": "{{baseUrl}}/posts/{{postId}}",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"posts",
 								"{{postId}}"
-							],
-							"query": [
-								{
-									"key": "createdAt",
-									"value": "{{createdAt}}"
-								}
 							]
 						},
 						"description": "Supprime un post. Nécessite une authentification JWT et que l'utilisateur soit le propriétaire du post."
@@ -175,7 +156,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/posts/search?query=serverless&limit=10",
+							"raw": "{{baseUrl}}/posts/search?q=serverless&tags=aws,lambda&limit=10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -185,9 +166,20 @@
 							],
 							"query": [
 								{
-									"key": "query",
+									"key": "q",
 									"value": "serverless",
-									"description": "Terme de recherche"
+									"description": "Terme de recherche dans titre/contenu (optionnel)"
+								},
+								{
+									"key": "tags",
+									"value": "aws,lambda",
+									"description": "Tags séparés par virgule (optionnel)"
+								},
+								{
+									"key": "status",
+									"value": "published",
+									"description": "Filtrer par statut (optionnel)",
+									"disabled": true
 								},
 								{
 									"key": "limit",
@@ -196,7 +188,7 @@
 								}
 							]
 						},
-						"description": "Recherche des posts par mot-clé dans le titre, le contenu ou les tags."
+						"description": "Recherche des posts par mot-clé dans le titre, le contenu ou par tags.\n\nParamètres:\n- q: Recherche dans titre et contenu (optionnel)\n- tags: Liste de tags séparés par virgule (optionnel)\n- status: Filtrer par statut (published, draft, archived)\n- limit: Nombre de résultats max\n\nAu moins un paramètre (q ou tags) est requis."
 					},
 					"response": []
 				}
@@ -296,7 +288,7 @@
 								"comments"
 							]
 						},
-						"description": "Crée un nouveau commentaire sur un post. Peut être anonyme ou authentifié.\n\nLe commentaire est créé avec le status 'pending' et doit être modéré."
+						"description": "Crée un nouveau commentaire sur un post. Peut être anonyme ou authentifié.\n\nLe commentaire est automatiquement approuvé (status: 'approved')."
 					},
 					"response": []
 				},
@@ -326,76 +318,6 @@
 						"description": "Liste tous les commentaires d'un post spécifique."
 					},
 					"response": []
-				},
-				{
-					"name": "Moderate Comment - Approve",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{authToken}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"status\": \"approved\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/comments/{{commentId}}/moderate",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"comments",
-								"{{commentId}}",
-								"moderate"
-							]
-						},
-						"description": "Approuve un commentaire en attente de modération. Nécessite une authentification JWT et le rôle modérateur."
-					},
-					"response": []
-				},
-				{
-					"name": "Moderate Comment - Reject",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "{{authToken}}",
-								"type": "text"
-							},
-							{
-								"key": "Content-Type",
-								"value": "application/json",
-								"type": "text"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"status\": \"rejected\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/comments/{{commentId}}/moderate",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"comments",
-								"{{commentId}}",
-								"moderate"
-							]
-						},
-						"description": "Rejette un commentaire. Nécessite une authentification JWT et le rôle modérateur."
-					},
-					"response": []
 				}
 			],
 			"description": "Endpoints pour la gestion des commentaires sur les posts"
@@ -416,7 +338,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"password\": \"Test123!@#\",\n    \"displayName\": \"Test User\"\n}"
+							"raw": "{\n    \"email\": \"test@example.com\",\n    \"username\": \"testuser\",\n    \"password\": \"Test123!@#\",\n    \"displayName\": \"Test User\",\n    \"role\": \"user\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/auth/register",
@@ -428,7 +350,7 @@
 								"register"
 							]
 						},
-						"description": "Crée un nouveau compte utilisateur.\n\nChamps requis:\n- email: Email valide\n- username: Nom d'utilisateur (3-20 caractères)\n- password: Mot de passe (8+ caractères, majuscule, minuscule, chiffre, symbole)\n\nChamps optionnels:\n- displayName: Nom d'affichage\n\nLe compte est créé dans Cognito et le profil dans DynamoDB."
+						"description": "Crée un nouveau compte utilisateur.\n\nChamps requis:\n- email: Email valide\n- username: Nom d'utilisateur (3-20 caractères)\n- password: Mot de passe (8+ caractères, majuscule, minuscule, chiffre, symbole)\n\nChamps optionnels:\n- displayName: Nom d'affichage\n- role: Rôle de l'utilisateur (user, editor, admin) - par défaut: user\n\nRôles disponibles:\n- user: Utilisateur standard (défaut)\n- editor: Peut modérer les commentaires\n- admin: Accès complet, peut modérer les commentaires\n\nLe rôle est synchronisé entre Cognito (custom:role) et DynamoDB."
 					},
 					"response": [],
 					"event": [
@@ -542,7 +464,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"displayName\": \"Jean Dupont\",\n    \"bio\": \"Développeur passionné par le serverless et AWS\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"website\": \"https://jeandupont.dev\",\n    \"location\": \"Paris, France\"\n}"
+							"raw": "{\n    \"displayName\": \"Jean Dupont\",\n    \"bio\": \"Développeur passionné par le serverless et AWS\",\n    \"avatar\": \"https://example.com/avatar.jpg\",\n    \"website\": \"https://jeandupont.dev\",\n    \"location\": \"Paris, France\",\n    \"role\": \"editor\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/profile",
@@ -553,7 +475,7 @@
 								"profile"
 							]
 						},
-						"description": "Met à jour le profil de l'utilisateur connecté. Nécessite une authentification JWT.\n\nChamps modifiables:\n- displayName: Nom d'affichage\n- bio: Biographie\n- avatar: URL de l'avatar\n- website: Site web personnel\n- location: Localisation"
+						"description": "Met à jour le profil de l'utilisateur connecté. Nécessite une authentification JWT.\n\nChamps modifiables:\n- displayName: Nom d'affichage\n- bio: Biographie\n- avatar: URL de l'avatar\n- website: Site web personnel\n- location: Localisation\n- role: Rôle de l'utilisateur (user, editor, admin)\n\nNote: La modification du rôle synchronise automatiquement Cognito et DynamoDB."
 					},
 					"response": []
 				},
@@ -641,10 +563,15 @@
 			"name": "Subscriptions",
 			"item": [
 				{
-					"name": "Subscribe",
+					"name": "Follow User",
 					"request": {
 						"method": "POST",
 						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
 							{
 								"key": "Content-Type",
 								"value": "application/json",
@@ -653,27 +580,32 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"subscriber@example.com\"\n}"
+							"raw": "{\n    \"userId\": \"user-id-to-follow\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/subscriptions/subscribe",
+							"raw": "{{baseUrl}}/subscriptions/follow",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"subscriptions",
-								"subscribe"
+								"follow"
 							]
 						},
-						"description": "S'abonne aux notifications de nouveaux posts.\n\nRetourne un subscriptionId qui peut être utilisé pour se désabonner."
+						"description": "Suivre un utilisateur pour recevoir des notifications de ses nouveaux posts.\n\nNécessite une authentification JWT.\n\nProtections:\n- Impossible de se suivre soi-même\n- Authentification requise"
 					},
 					"response": []
 				},
 				{
-					"name": "Unsubscribe",
+					"name": "Unfollow User",
 					"request": {
 						"method": "POST",
 						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							},
 							{
 								"key": "Content-Type",
 								"value": "application/json",
@@ -682,24 +614,74 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"subscriber@example.com\",\n    \"subscriptionId\": \"{{subscriptionId}}\"\n}"
+							"raw": "{\n    \"userId\": \"user-id-to-unfollow\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/subscriptions/unsubscribe",
+							"raw": "{{baseUrl}}/subscriptions/unfollow",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"subscriptions",
-								"unsubscribe"
+								"unfollow"
 							]
 						},
-						"description": "Se désabonne des notifications.\n\nNécessite l'email et le subscriptionId reçu lors de l'abonnement."
+						"description": "Ne plus suivre un utilisateur.\n\nNécessite une authentification JWT."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Following",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/following",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions",
+								"following"
+							]
+						},
+						"description": "Récupère la liste des utilisateurs que je suis.\n\nRetourne:\n- following: Liste des abonnements avec followerId, followedId, createdAt\n- count: Nombre total d'utilisateurs suivis"
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Followers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{authToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/subscriptions/followers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"subscriptions",
+								"followers"
+							]
+						},
+						"description": "Récupère la liste de mes abonnés (utilisateurs qui me suivent).\n\nRetourne:\n- followers: Liste des abonnés avec followerId, followedId, createdAt\n- count: Nombre total d'abonnés"
 					},
 					"response": []
 				}
 			],
-			"description": "Endpoints pour la gestion des abonnements aux notifications"
+			"description": "Endpoints pour suivre des utilisateurs et gérer ses abonnements.\n\nLe système permet de:\n- Suivre un utilisateur pour être notifié de ses nouveaux posts\n- Ne plus suivre un utilisateur\n- Voir qui on suit (following)\n- Voir qui nous suit (followers)"
 		}
 	],
 	"event": [
@@ -739,7 +721,7 @@
 			"type": "string"
 		},
 		{
-			"key": "createdAt",
+			"key": "userId",
 			"value": "",
 			"type": "string"
 		},

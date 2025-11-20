@@ -4,7 +4,6 @@ const { DynamoDBDocumentClient, QueryCommand, GetCommand } = require("@aws-sdk/l
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-// Helper pour récupérer les infos publiques de l'auteur
 async function getAuthorInfo(userId) {
   try {
     const result = await docClient.send(new GetCommand({
@@ -63,7 +62,6 @@ exports.handler = async (event) => {
       const { ScanCommand } = require("@aws-sdk/lib-dynamodb");
       const result = await docClient.send(new ScanCommand(queryParams));
 
-      // Enrichir chaque post avec les infos de l'auteur
       const enrichedPosts = await Promise.all(
         result.Items.map(async (post) => {
           const author = await getAuthorInfo(post.userId);
@@ -76,16 +74,21 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+          'Access-Control-Allow-Methods': 'GET,OPTIONS'
+        },
         body: JSON.stringify({
           items: enrichedPosts,
           count: result.Count
         })
       };
     }
-    
+
     const result = await docClient.send(new QueryCommand(queryParams));
 
-    // Enrichir chaque post avec les infos de l'auteur
     const enrichedPosts = await Promise.all(
       result.Items.map(async (post) => {
         const author = await getAuthorInfo(post.userId);
@@ -98,6 +101,12 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS'
+      },
       body: JSON.stringify({
         items: enrichedPosts,
         count: result.Count
@@ -107,6 +116,12 @@ exports.handler = async (event) => {
     console.error(error);
     return {
       statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS'
+      },
       body: JSON.stringify({ message: "Internal server error" })
     };
   }

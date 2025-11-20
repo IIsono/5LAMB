@@ -1,4 +1,5 @@
 const { CognitoIdentityProviderClient, InitiateAuthCommand, AdminConfirmSignUpCommand, AdminGetUserCommand } = require("@aws-sdk/client-cognito-identity-provider");
+const { corsHeaders } = require("./utils/corsHeaders");
 
 const client = new CognitoIdentityProviderClient({});
 
@@ -7,20 +8,18 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const { username, email, password } = body;
 
-    // Accepter username OU email
     const loginIdentifier = username || email;
 
-    // Validation
     if (!loginIdentifier || !password) {
       return {
         statusCode: 400,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "Username/email and password are required"
         })
       };
     }
 
-    // Authentification avec Cognito
     const command = new InitiateAuthCommand({
       AuthFlow: "USER_PASSWORD_AUTH",
       ClientId: process.env.COGNITO_CLIENT_ID,
@@ -32,10 +31,10 @@ exports.handler = async (event) => {
 
     const response = await client.send(command);
 
-    // Vérifier si un challenge est requis
     if (response.ChallengeName) {
       return {
         statusCode: 200,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "Additional authentication required",
           challengeName: response.ChallengeName,
@@ -45,26 +44,22 @@ exports.handler = async (event) => {
       };
     }
 
-    // Succès - retourner les tokens
     return {
       statusCode: 200,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Login successful",
-        authToken: response.AuthenticationResult.IdToken,
-        accessToken: response.AuthenticationResult.AccessToken,
-        refreshToken: response.AuthenticationResult.RefreshToken,
-        expiresIn: response.AuthenticationResult.ExpiresIn,
-        tokenType: response.AuthenticationResult.TokenType
+        token: response.AuthenticationResult.IdToken
       })
     };
 
   } catch (error) {
     console.error("Login error:", error);
 
-    // Erreurs spécifiques de Cognito
     if (error.name === "NotAuthorizedException") {
       return {
         statusCode: 401,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "Invalid username or password"
         })
@@ -72,7 +67,6 @@ exports.handler = async (event) => {
     }
 
     if (error.name === "UserNotConfirmedException") {
-      // Si AUTO_CONFIRM est activé, confirmer automatiquement l'utilisateur
       if (process.env.AUTO_CONFIRM_USERS === "true") {
         try {
           await client.send(new AdminConfirmSignUpCommand({
@@ -80,7 +74,6 @@ exports.handler = async (event) => {
             Username: loginIdentifier
           }));
 
-          // Réessayer la connexion après confirmation
           const retryCommand = new InitiateAuthCommand({
             AuthFlow: "USER_PASSWORD_AUTH",
             ClientId: process.env.COGNITO_CLIENT_ID,
@@ -94,13 +87,10 @@ exports.handler = async (event) => {
 
           return {
             statusCode: 200,
+            headers: corsHeaders,
             body: JSON.stringify({
               message: "Login successful (account auto-confirmed)",
-              authToken: retryResponse.AuthenticationResult.IdToken,
-              accessToken: retryResponse.AuthenticationResult.AccessToken,
-              refreshToken: retryResponse.AuthenticationResult.RefreshToken,
-              expiresIn: retryResponse.AuthenticationResult.ExpiresIn,
-              tokenType: retryResponse.AuthenticationResult.TokenType
+              token: retryResponse.AuthenticationResult.IdToken
             })
           };
         } catch (confirmError) {
@@ -110,6 +100,7 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 403,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "User account is not confirmed. Please verify your email."
         })
@@ -119,6 +110,7 @@ exports.handler = async (event) => {
     if (error.name === "UserNotFoundException") {
       return {
         statusCode: 404,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "User not found"
         })
@@ -128,6 +120,7 @@ exports.handler = async (event) => {
     if (error.name === "PasswordResetRequiredException") {
       return {
         statusCode: 403,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "Password reset required"
         })
@@ -137,6 +130,7 @@ exports.handler = async (event) => {
     if (error.name === "TooManyRequestsException") {
       return {
         statusCode: 429,
+        headers: corsHeaders,
         body: JSON.stringify({
           message: "Too many login attempts. Please try again later."
         })
@@ -145,6 +139,7 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({
         message: "Login failed",
         error: error.message

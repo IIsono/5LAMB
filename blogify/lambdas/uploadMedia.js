@@ -10,7 +10,16 @@ const docClient = DynamoDBDocumentClient.from(dynamoClient);
 
 exports.handler = async (event) => {
   try {
-    const userId = event.requestContext.authorizer.jwt.claims.sub;
+    const claims = event.requestContext.authorizer?.jwt?.claims || event.requestContext.authorizer?.claims || {};
+    const userId = claims.sub;
+
+    if (!userId) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Unauthorized - No user ID in token" })
+      };
+    }
+
     const body = JSON.parse(event.body);
     
     const { fileName, fileType, fileSize } = body;
